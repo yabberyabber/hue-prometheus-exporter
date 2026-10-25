@@ -42,6 +42,9 @@ spec:
             - --bridge-id={{ .Values.bridge.id }}
             - --listen-address={{ .Values.metrics.bindAddress }}:{{ .Values.metrics.port }}
             - --poll-interval={{ .Values.pollInterval }}
+            {{- if .Values.verbose }}
+            - --verbose
+            {{- end }}
             {{- with .Values.bridge.addressHint }}
             - --bridge-address={{ . }}
             {{- end }}

@@ -33,6 +33,8 @@ func main() {
 		"address to serve /metrics on")
 	flag.DurationVar(&cfg.PollInterval, "poll-interval", 60*time.Second,
 		"how often to read the bridge (minimum 5s)")
+	flag.BoolVar(&cfg.Verbose, "verbose", false,
+		"log every finished poll and every /metrics request with its status code and duration")
 	flag.Parse()
 
 	if cfg.BridgeID == "" {

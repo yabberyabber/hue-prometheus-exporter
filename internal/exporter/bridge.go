@@ -98,6 +98,14 @@ type resp[T any] struct {
 	Data []T `json:"data"`
 }
 
+// statusError is a non-200 answer from the bridge.
+type statusError struct {
+	resource string
+	code     int
+}
+
+func (e *statusError) Error() string { return fmt.Sprintf("GET %s: HTTP %d", e.resource, e.code) }
+
 func getResource[T any](ctx context.Context, c *bridgeClient, addr, resource string) ([]T, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://"+addr+"/clip/v2/resource/"+resource, nil)
 	if err != nil {
@@ -114,7 +122,7 @@ func getResource[T any](ctx context.Context, c *bridgeClient, addr, resource str
 		return nil, &unreachableError{err}
 	}
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GET %s: HTTP %d", resource, res.StatusCode)
+		return nil, &statusError{resource: resource, code: res.StatusCode}
 	}
 	var out resp[T]
 	if err := json.Unmarshal(body, &out); err != nil {

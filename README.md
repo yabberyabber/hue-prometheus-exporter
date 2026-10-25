@@ -53,6 +53,7 @@ the process list.
 | `--application-key-file` (`HUE_APPLICATION_KEY_FILE`) | | File holding the key (or set `HUE_APPLICATION_KEY`) |
 | `--listen-address` (`LISTEN_ADDRESS`) | `:9185` | Where to serve `/metrics` (and `/healthz`) |
 | `--poll-interval` | `60s` | How often to read the bridge (minimum 5s) |
+| `--verbose` | off | Log every finished poll and every `/metrics` request with its status code and duration |
 | `--bridge-address` (`HUE_BRIDGE_ADDRESS`) | | Optional IP to try first instead of mDNS |
 | `--mdns-interface` (`HUE_MDNS_INTERFACE`) | OS choice | NIC to send mDNS queries from; set on hosts with many interfaces |
 | `--ca-file` (`HUE_CA_FILE`) | built in | CA bundle for the bridge certificate |
@@ -133,6 +134,7 @@ for all of them):
 | Value | Why |
 |---|---|
 | `mdnsInterface` | On nodes with several interfaces (docker/CNI bridges, VPNs), set this to the one on your LAN, e.g. `eth0`. |
+| `verbose` (default `true`) | Passes `--verbose`: logs every finished poll and every `/metrics` request with its status code and duration. Set `false` for quieter logs. |
 | `hostNetwork` (default `true`) | mDNS needs the node's network namespace. The metrics port is then a node port and must be free. Set `false` only if you also set `bridge.addressHint`. |
 | `metrics.bindAddress` | Empty binds all interfaces, which with `hostNetwork` exposes `/metrics` (including the bridge's address) on your LAN. Use `127.0.0.1` if Prometheus is on the same node with `hostNetwork` too. |
 | `applicationKey.value` | Lets the chart create the Secret for you; the key then lands in your Helm values and release history, so prefer `existingSecret`. |

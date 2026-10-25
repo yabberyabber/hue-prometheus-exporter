@@ -39,6 +39,10 @@ mdnsInterface: ""
 
 pollInterval: 60s
 
+# Log every finished poll and every /metrics request with its status code and
+# duration. (The exporter itself defaults to off; the chart turns it on.)
+verbose: true
+
 metrics:
   port: 9185
   # Address to bind. Empty binds all interfaces. With hostNetwork that publishes

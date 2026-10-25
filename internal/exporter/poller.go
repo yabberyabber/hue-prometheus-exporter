@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -36,6 +37,7 @@ type poller struct {
 	fetch   sensorFetcher
 	backoff backoff
 	metrics *metrics
+	verbose bool // log every finished poll
 	now     func() time.Time
 }
 
@@ -54,11 +56,15 @@ func (p *poller) step(ctx context.Context) {
 		return
 	}
 
+	start := time.Now()
 	sensors, err := p.fetch.Fetch(ctx, p.addr)
+	if ctx.Err() != nil {
+		return
+	}
+	if p.verbose {
+		log.Printf("poll finished: status=%s duration=%s", pollStatus(err), time.Since(start).Round(time.Millisecond))
+	}
 	if err != nil {
-		if ctx.Err() != nil {
-			return
-		}
 		p.metrics.pollFailed()
 		var un *unreachableError
 		if !errors.As(err, &un) {
@@ -76,6 +82,20 @@ func (p *poller) step(ctx context.Context) {
 	}
 	p.failures = 0
 	p.metrics.pollSucceeded(sensors, p.now())
+}
+
+// pollStatus is the HTTP status of a finished poll: 200 on success, the
+// bridge's status if it refused a request, "none" if no status is known
+// (transport failure or an unparseable body).
+func pollStatus(err error) string {
+	if err == nil {
+		return "200"
+	}
+	var se *statusError
+	if errors.As(err, &se) {
+		return strconv.Itoa(se.code)
+	}
+	return "none"
 }
 
 // unreachable handles a transport-level failure of the current address.
