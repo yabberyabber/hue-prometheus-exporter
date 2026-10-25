@@ -1,0 +1,89 @@
+{{- $_ := required "bridge.id is required (your Hue bridge ID, e.g. 001788FFFE123456)" .Values.bridge.id -}}
+{{- if not (or .Values.applicationKey.existingSecret .Values.applicationKey.value) -}}
+{{- fail "provide the Hue application key: set applicationKey.existingSecret (recommended) or applicationKey.value" -}}
+{{- end -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hpe.name" . }}
+  labels:
+    {{- include "hpe.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  # With hostNetwork the metrics port is bound on the node, so the old pod must
+  # be gone before the new one starts or the rollout deadlocks on the port.
+  strategy:
+    type: {{ ternary "Recreate" "RollingUpdate" .Values.hostNetwork }}
+  selector:
+    matchLabels:
+      {{- include "hpe.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "hpe.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      hostNetwork: {{ .Values.hostNetwork }}
+      {{- if .Values.hostNetwork }}
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: hue-prometheus-exporter
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --bridge-id={{ .Values.bridge.id }}
+            - --listen-address={{ .Values.metrics.bindAddress }}:{{ .Values.metrics.port }}
+            - --poll-interval={{ .Values.pollInterval }}
+            {{- with .Values.bridge.addressHint }}
+            - --bridge-address={{ . }}
+            {{- end }}
+            {{- with .Values.mdnsInterface }}
+            - --mdns-interface={{ . }}
+            {{- end }}
+          env:
+            - name: HUE_APPLICATION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "hpe.secretName" . }}
+                  key: {{ include "hpe.secretKey" . }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+          readinessProbe:
+            httpGet:
+              {{- with .Values.metrics.bindAddress }}
+              host: {{ . }} # the listener isn't on the pod IP; kubelet probes from the node
+              {{- end }}
+              path: /healthz
+              port: metrics
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            capabilities:
+              drop: ["ALL"]
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

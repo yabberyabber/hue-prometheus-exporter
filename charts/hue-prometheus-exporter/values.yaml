@@ -1,0 +1,58 @@
+image:
+  repository: ghcr.io/yabberyabber/hue-prometheus-exporter
+  # Defaults to the chart's appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+bridge:
+  # Required. Your bridge's ID, e.g. 001788FFFE123456. Find it in the Hue app
+  # (Settings > My Hue system > your bridge) or at https://<bridge-ip>/api/config.
+  # This is how the exporter recognises your bridge; its IP is discovered.
+  id: ""
+  # Optional first guess for the bridge's IP. Leave empty to use mDNS.
+  addressHint: ""
+
+# The Hue application key. Provide it ONE of two ways:
+applicationKey:
+  # (recommended) the name of an existing Secret holding the key:
+  #   kubectl create secret generic hue-credentials \
+  #     --from-literal=application-key="$HUE_APPLICATION_KEY"
+  existingSecret: ""
+  existingSecretKey: application-key
+  # (not recommended: ends up in Helm release history and your values files)
+  # have the chart create the Secret from this value.
+  value: ""
+
+# mDNS discovery uses multicast, which only works from the node's own network
+# namespace, so the pod runs with hostNetwork by default. With hostNetwork the
+# metrics port is a port on the node and must be free. Set this to false if you
+# set bridge.addressHint and don't need discovery (a stale hint is then never
+# corrected automatically).
+hostNetwork: true
+
+# Network interface to send mDNS queries from, e.g. eth0. Set this on nodes
+# with several interfaces (docker/CNI bridges, VPNs): multicast sent out the
+# wrong one never reaches your LAN. Empty lets the OS choose.
+mdnsInterface: ""
+
+pollInterval: 60s
+
+metrics:
+  port: 9185
+  # Address to bind. Empty binds all interfaces. With hostNetwork that publishes
+  # /metrics (including the bridge's address) to your whole LAN; set 127.0.0.1
+  # if Prometheus runs on the same node with hostNetwork too.
+  bindAddress: ""
+
+# A ClusterIP Service for Prometheus to scrape. Pointless when bindAddress is
+# loopback.
+service:
+  enabled: true
+
+podAnnotations: {}
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,26 @@
+{
+  "errors": [],
+  "data": [
+    {
+      "id": "3f1c2a10-1111-4a5b-9c01-000000000001",
+      "type": "device",
+      "metadata": {
+        "name": "Hallway sensor"
+      }
+    },
+    {
+      "id": "3f1c2a10-1111-4a5b-9c01-000000000002",
+      "type": "device",
+      "metadata": {
+        "name": "Outdoor sensor 1"
+      }
+    },
+    {
+      "id": "3f1c2a10-1111-4a5b-9c01-000000000003",
+      "type": "device",
+      "metadata": {
+        "name": "Outdoor sensor 2"
+      }
+    }
+  ]
+}

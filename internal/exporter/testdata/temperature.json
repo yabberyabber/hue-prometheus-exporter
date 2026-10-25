@@ -1,0 +1,52 @@
+{
+  "errors": [],
+  "data": [
+    {
+      "id": "7a000000-0000-4000-8000-000000000001",
+      "id_v1": "/sensors/10",
+      "owner": {
+        "rid": "3f1c2a10-1111-4a5b-9c01-000000000003",
+        "rtype": "device"
+      },
+      "enabled": false,
+      "temperature": {
+        "temperature_valid": false
+      },
+      "type": "temperature"
+    },
+    {
+      "id": "7a000000-0000-4000-8000-000000000002",
+      "id_v1": "/sensors/20",
+      "owner": {
+        "rid": "3f1c2a10-1111-4a5b-9c01-000000000001",
+        "rtype": "device"
+      },
+      "enabled": true,
+      "temperature": {
+        "temperature_report": {
+          "changed": "2026-01-01T12:00:00.000Z",
+          "temperature": 24.51
+        },
+        "temperature_valid": true
+      },
+      "type": "temperature"
+    },
+    {
+      "id": "7a000000-0000-4000-8000-000000000003",
+      "id_v1": "/sensors/30",
+      "owner": {
+        "rid": "3f1c2a10-1111-4a5b-9c01-000000000002",
+        "rtype": "device"
+      },
+      "enabled": true,
+      "temperature": {
+        "temperature_report": {
+          "changed": "2026-01-01T12:00:10.000Z",
+          "temperature": 22.03
+        },
+        "temperature_valid": true
+      },
+      "type": "temperature"
+    }
+  ]
+}

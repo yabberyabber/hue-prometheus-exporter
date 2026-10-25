@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "data": [
+    {
+      "id": "9c000000-0000-4000-8000-000000000001",
+      "type": "room",
+      "metadata": {
+        "name": "Outside"
+      },
+      "children": [
+        {
+          "rid": "3f1c2a10-1111-4a5b-9c01-000000000002",
+          "rtype": "device"
+        },
+        {
+          "rid": "3f1c2a10-1111-4a5b-9c01-000000000003",
+          "rtype": "device"
+        }
+      ]
+    },
+    {
+      "id": "9c000000-0000-4000-8000-000000000002",
+      "type": "room",
+      "metadata": {
+        "name": "Hallway"
+      },
+      "children": [
+        {
+          "rid": "3f1c2a10-1111-4a5b-9c01-000000000001",
+          "rtype": "device"
+        },
+        {
+          "rid": "3f1c2a10-1111-4a5b-9c01-0000000000ff",
+          "rtype": "device"
+        }
+      ]
+    }
+  ]
+}

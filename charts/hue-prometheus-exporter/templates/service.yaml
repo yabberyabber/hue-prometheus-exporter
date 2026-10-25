@@ -1,0 +1,15 @@
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "hpe.name" . }}
+  labels:
+    {{- include "hpe.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "hpe.selectorLabels" . | nindent 4 }}
+  ports:
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+{{- end }}
